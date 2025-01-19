@@ -14,6 +14,7 @@ export class UserModel extends DatabaseModel {
     email: string
     age: number
     role: ROLE
+    password: string
 }
 
 export default (sequelize: Sequelize) => {
@@ -34,13 +35,17 @@ export default (sequelize: Sequelize) => {
             type: DataTypes.STRING(200)
         },
         email: {
-            type: DataTypes.STRING(200)
+            type: DataTypes.STRING(200),
+            unique: true
         },
         age: {
             type: DataTypes.INTEGER,
         },
         role: {
             type: DataTypes.ENUM(...Object.values(ROLE))
+        },
+        password: {
+            type: DataTypes.STRING(200)
         }
     }, {
         paranoid: true,
