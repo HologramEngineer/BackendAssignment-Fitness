@@ -8,7 +8,8 @@ import defineExercise from './exercise'
 import defineProgram from './program'
 
 const sequelize: Sequelize = new Sequelize('postgresql://localhost:5432/fitness_app', {
-	logging: false
+	logging: false,
+	username: 'postgres'
 })
 
 sequelize.authenticate().catch((e: any) => console.error(`Unable to connect to the database${e}.`))
