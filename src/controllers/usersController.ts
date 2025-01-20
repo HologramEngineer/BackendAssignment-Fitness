@@ -95,7 +95,7 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
                 }
 
                 // create jwt token to be used for authorization
-                const jwt_token = jwt.sign(user_data, "SECRET_KEY", {expiresIn: '1h'})
+                const jwt_token = jwt.sign(user_data, process.env.JWT_SECRET, {expiresIn: '1h'})
 
                 // save jwt token to user's cookies
                 res.cookie('jwt', jwt_token, {

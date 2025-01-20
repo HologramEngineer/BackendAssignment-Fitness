@@ -24,5 +24,9 @@ export default () => {
 		})
 	})
 
+	router.post('/', async (_req: Request, res: Response, _next: NextFunction) => {
+
+	})
+
 	return router
 }

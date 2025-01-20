@@ -1,6 +1,7 @@
 import http from 'http'
 import express from 'express'
 import * as bodyParser from 'body-parser'
+import 'dotenv/config'
 
 import { sequelize } from './db'
 import ProgramRouter from './routes/programs'
