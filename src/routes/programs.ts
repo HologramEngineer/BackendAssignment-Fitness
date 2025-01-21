@@ -29,13 +29,13 @@ export default () => {
 
     router.post('/', passport.authenticate('jwt', {session: false}),
         async (_req: Request, res: Response, _next: NextFunction) => {
-            let user = _req.user as UserModel
+            const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
 
             try {
-                let newProgram = await Program.create({
+                const newProgram = await Program.create({
                     name: _req.body.name
                 })
 
@@ -51,7 +51,7 @@ export default () => {
 
     router.patch('/', passport.authenticate('jwt', {session: false}),
         async (_req: Request, res: Response, _next: NextFunction) => {
-            let user = _req.user as UserModel
+            const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
@@ -76,13 +76,13 @@ export default () => {
 
     router.delete('/', passport.authenticate('jwt', {session: false}),
         async (_req: Request, res: Response, _next: NextFunction) => {
-            let user = _req.user as UserModel
+            const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
 
             try {
-                let program = await Program.findOne(
+                const program = await Program.findOne(
                     {
                         where: {id: _req.body.id},
                         include: [{

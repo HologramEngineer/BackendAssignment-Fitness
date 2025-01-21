@@ -23,7 +23,7 @@ exports.registerUser = async (_req: Request, res: Response, _next: NextFunction)
         return res.status(400).json({message: 'Role is required'})
 
     let roleString = (_req.body.role as string).toUpperCase() as keyof typeof ROLE
-    let role = ROLE[roleString]
+    const role = ROLE[roleString]
 
     if (role == undefined)
         return res.status(400).json({message: 'Proper role is required'})
@@ -33,7 +33,7 @@ exports.registerUser = async (_req: Request, res: Response, _next: NextFunction)
             console.error('Error hashing password: ' + err.message)
             return res.status(400).send({message: 'Error hashing password'})
         } else {
-            let [user, created] = await User.findOrCreate({
+            const [user, created] = await User.findOrCreate({
                 where: {email: _req.body.email},
                 defaults: {
                     // required
@@ -119,7 +119,7 @@ exports.logoutUser = async (_req: Request, res: Response, _next: NextFunction) =
 }
 
 exports.getUsers = async (_req: Request, res: Response, _next: NextFunction) => {
-    let user = _req.user as UserModel
+    const user = _req.user as UserModel
 
     switch (user.role) {
         case ROLE.ADMIN:
@@ -144,7 +144,7 @@ exports.getUsers = async (_req: Request, res: Response, _next: NextFunction) => 
 }
 
 exports.getUser = async (_req: Request, res: Response, _next: NextFunction) => {
-    let user = _req.user as UserModel
+    const user = _req.user as UserModel
     const id = parseInt(_req.params.id)
 
     if (id == undefined)
@@ -176,7 +176,7 @@ exports.getUser = async (_req: Request, res: Response, _next: NextFunction) => {
 }
 
 exports.getCurrentUser = async (_req: Request, res: Response, _next: NextFunction) => {
-    let user = _req.user as UserModel
+    const user = _req.user as UserModel
 
     switch (user.role) {
         case ROLE.ADMIN:
@@ -197,7 +197,7 @@ exports.getCurrentUser = async (_req: Request, res: Response, _next: NextFunctio
 }
 
 exports.updateUser = async (_req: Request, res: Response, _next: NextFunction) => {
-    let user = _req.user as UserModel
+    const user = _req.user as UserModel
     if (user.role != ROLE.ADMIN)
         return res.status(403).send({message: 'Updating user data requires ADMIN privileges'})
 

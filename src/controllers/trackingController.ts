@@ -8,7 +8,7 @@ const {
 } = models
 
 exports.getTrackedExercises = async (_req: Request, res: Response, _next: NextFunction) => {
-	let user = _req.user as UserModel
+	const user = _req.user as UserModel
 
 	const trackedExercises = await ExerciseHistory.findAll({
 		where: {userID: user.id},
@@ -27,7 +27,7 @@ exports.getTrackedExercises = async (_req: Request, res: Response, _next: NextFu
 }
 
 exports.postTrackedExercise = async (_req: Request, res: Response, _next: NextFunction) => {
-	let user = _req.user as UserModel
+	const user = _req.user as UserModel
 
 	try {
 		const createdExercise = await ExerciseHistory.create({
@@ -48,7 +48,7 @@ exports.postTrackedExercise = async (_req: Request, res: Response, _next: NextFu
 }
 
 exports.removeTrackedExercise = async (_req: Request, res: Response, _next: NextFunction) => {
-	let user = _req.user as UserModel
+	const user = _req.user as UserModel
 
 	try {
 		const rowsUpdated = await ExerciseHistory.destroy({

@@ -30,7 +30,7 @@ export default () => {
 
     router.post('/', passport.authenticate('jwt', {session: false}),
         async (_req: Request, res: Response, _next: NextFunction) => {
-            let user = _req.user as UserModel
+            const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting exercises requires ADMIN privileges.')
@@ -38,12 +38,12 @@ export default () => {
             let diff: EXERCISE_DIFFICULTY
 
             if (_req.body.difficulty != undefined) {
-                let diffString = (_req.body.difficulty as string).toUpperCase() as keyof typeof EXERCISE_DIFFICULTY
+                const diffString = (_req.body.difficulty as string).toUpperCase() as keyof typeof EXERCISE_DIFFICULTY
                 diff = EXERCISE_DIFFICULTY[diffString]
             }
 
             try {
-                let newExercise = await Exercise.create({
+                const newExercise = await Exercise.create({
                     name: _req.body.name,
                     difficulty: diff,
                     programID: _req.body.programID
@@ -61,7 +61,7 @@ export default () => {
 
     router.patch('/', passport.authenticate('jwt', {session: false}),
         async (_req: Request, res: Response, _next: NextFunction) => {
-            let user = _req.user as UserModel
+            const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting exercises requires ADMIN privileges.')
@@ -101,7 +101,7 @@ export default () => {
 
     router.delete('/', passport.authenticate('jwt', {session: false}),
         async (_req: Request, res: Response, _next: NextFunction) => {
-            let user = _req.user as UserModel
+            const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting exercises requires ADMIN privileges.')
