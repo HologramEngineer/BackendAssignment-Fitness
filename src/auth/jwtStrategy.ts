@@ -20,8 +20,7 @@ const options = {
 export const jwtStrategy = new JwtStrategy(
     options,
     async function (jwtPayload, done) {
-        console.log(jwtPayload);
-
+        // looking for user in database
         let user = await User.findOne({where:{email: jwtPayload.email}})
 
         if (!user) {
