@@ -2,13 +2,12 @@
 
 import {
 	Sequelize,
-	DataTypes,
-	Model
+	DataTypes
 } from 'sequelize'
-import { DatabaseModel } from '../types/db'
-import { ProgramModel } from './program'
+import {DatabaseModel} from '../types/db'
+import {ProgramModel} from './program'
 
-import { EXERCISE_DIFFICULTY } from '../utils/enums'
+import {EXERCISE_DIFFICULTY} from '../utils/enums'
 
 export class ExerciseModel extends DatabaseModel {
 	id: number

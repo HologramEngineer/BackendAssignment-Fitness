@@ -5,6 +5,7 @@ import fs from 'fs'
 import { Sequelize } from 'sequelize'
 
 import defineExercise from './exercise'
+import defineExerciseHistory from './exerciseHistory'
 import defineProgram from './program'
 import defineUser from './user'
 
@@ -18,6 +19,7 @@ sequelize.authenticate().catch((e: any) => console.error(`Unable to connect to t
 const modelsBuilder = (instance: Sequelize) => ({
 	// Import models to sequelize
 	Exercise: instance.import(path.join(__dirname, 'exercise'), defineExercise),
+	ExerciseHistory: instance.import(path.join(__dirname, 'history'), defineExerciseHistory),
 	Program: instance.import(path.join(__dirname, 'program'), defineProgram),
 	User: instance.import(path.join(__dirname, 'user'), defineUser),
 })
