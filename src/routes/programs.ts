@@ -14,7 +14,8 @@ import {ProgramModel} from "../db/program";
 const router: Router = Router()
 
 const {
-    Program
+    Program,
+    Exercise
 } = models
 
 export default () => {
@@ -81,16 +82,26 @@ export default () => {
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
 
             try {
-                // todo: try to delete associated exercises when deleting program
+                let program = await Program.findOne(
+                    {
+                        where: {id: _req.body.id},
+                        include: [{
+                            model: Exercise,
+                            as: 'translations'
+                        }]
+                    }) as ProgramModel
 
-                const rowsUpdated = await Program.destroy({where: {id: _req.body.id}})
-
-                if (rowsUpdated>0)
-                    return res.status(200).send('Program with id ' + _req.body.id + ' deleted successfully.')
-                else
+                if (program == undefined)
                     return res.status(200).send('Program with id ' + _req.body.id + ' was not deleted. ' +
                         'Please check if it exists.')
 
+                for (let i = 0; i < program.translations.length; i++) {
+                    await program.translations[i].destroy()
+                }
+
+                program.destroy()
+
+                return res.status(200).send('Program with id ' + _req.body.id + ' deleted successfully.')
             } catch (error) {
                 return res.status(400).send(error)
             }
