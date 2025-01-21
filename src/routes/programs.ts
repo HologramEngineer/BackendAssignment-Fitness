@@ -81,6 +81,8 @@ export default () => {
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
 
             try {
+                // todo: try to delete associated exercises when deleting program
+
                 const rowsUpdated = await Program.destroy({where: {id: _req.body.id}})
 
                 if (rowsUpdated>0)
