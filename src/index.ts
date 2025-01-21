@@ -11,6 +11,7 @@ import cookieParser from 'cookie-parser'
 import ProgramRouter from './routes/programs'
 import ExerciseRouter from './routes/exercises'
 import UserRouter from './routes/users'
+import TrackingRouter from './routes/tracking'
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use(cookieParser())
 app.use('/programs', ProgramRouter())
 app.use('/exercises', ExerciseRouter())
 app.use('/users', UserRouter())
+app.use('/tracking', TrackingRouter())
 
 const httpServer = http.createServer(app)
 
