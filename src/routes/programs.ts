@@ -95,7 +95,9 @@ export default () => {
                     return res.status(200).send('Program with id ' + _req.body.id + ' was not deleted. ' +
                         'Please check if it exists.')
 
+                // @ts-ignore
                 for (let i = 0; i < program.translations.length; i++) {
+                    // @ts-ignore
                     await program.translations[i].destroy()
                 }
 

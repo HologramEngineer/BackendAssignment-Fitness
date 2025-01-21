@@ -10,6 +10,8 @@ import {UserModel} from "../db/user";
 const {
     User
 } = models
+
+
 exports.registerUser = async (_req: Request, res: Response, _next: NextFunction) => {
     console.log('User started registration process')
 
@@ -109,5 +111,30 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
             }
         }
     })
+}
+
+exports.getUsers = async (_req: Request, res: Response, _next: NextFunction) => {
+    let user = _req.user as UserModel
+
+    switch (user.role) {
+        case ROLE.ADMIN:
+            console.log('Getting all users with their associated data')
+
+            const fullUsers = await User.findAll()
+            return res.status(200).json({
+                data: fullUsers,
+                message: 'All users with their associated data'
+            })
+        case ROLE.USER:
+            console.log('Getting all users with only their ID and nick name')
+
+            const limitedUsers = await User.findAll({
+                attributes: ['id', 'nickName'],
+            })
+            return res.status(200).json({
+                data: limitedUsers,
+                message: 'All users with their limited data'
+            })
+    }
 }
 
