@@ -5,6 +5,7 @@ import passport from "passport";
 import {UserModel} from "../db/user";
 import {EXERCISE_DIFFICULTY, ROLE} from "../utils/enums";
 import {ExerciseModel} from "../db/exercise";
+import {FindOptions} from "sequelize";
 
 const router: Router = Router()
 
@@ -15,12 +16,26 @@ const {
 
 export default () => {
     router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
-        const exercises = await Exercise.findAll({
+        let options:FindOptions = {
             include: [{
                 model: Program,
                 as: 'program'
             }]
-        })
+        }
+
+        if (_req.query.page && _req.query.limit)
+        {
+            console.log('Doing paginated search with limit ' + _req.query.limit + ' starting at page ' + _req.query.page)
+
+            const limit = parseInt(<string>_req.query.limit)
+            const offset = (parseInt(<string>_req.query.page) - 1) * limit
+
+            options.limit = limit
+            options.offset = offset
+
+        }
+
+        const exercises = await Exercise.findAll(options)
 
         return res.json({
             data: exercises,
