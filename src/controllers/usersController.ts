@@ -138,3 +138,56 @@ exports.getUsers = async (_req: Request, res: Response, _next: NextFunction) => 
     }
 }
 
+exports.getUser = async (_req: Request, res: Response, _next: NextFunction) => {
+    let user = _req.user as UserModel
+    const id = parseInt(_req.params.id)
+
+    if (id == undefined)
+        return res.status(400).send({message: 'Wrong user id'})
+
+    console.log('Getting all data of single user')
+
+    switch (user.role) {
+        case ROLE.ADMIN:
+            const userData = await User.findOne({where: {id: id}})
+            return res.status(200).json({
+                data: userData,
+                message: 'All data for user ' + id
+            })
+        case ROLE.USER:
+            console.log('Role: User, can access only their own data')
+
+            if (user.id != id)
+                return res.status(403).send({message: 'Can\'t access user'})
+
+            const currentUserData = await User.findOne({where: {id: id},
+                attributes: ['name', 'surname', 'age', 'nickName'],
+            })
+            return res.status(200).json({
+                data: currentUserData,
+                message: 'Data for current user'
+            })
+    }
+}
+
+exports.getCurrentUser = async (_req: Request, res: Response, _next: NextFunction) => {
+    let user = _req.user as UserModel
+
+    switch (user.role) {
+        case ROLE.ADMIN:
+            const adminData = await User.findOne({where: {id: user.id}})
+            return res.status(200).json({
+                data: adminData,
+                message: 'My data'
+            })
+        case ROLE.USER:
+            const userData = await User.findOne({where: {id: user.id},
+                attributes: ['name', 'surname', 'age', 'nickName'],
+            })
+            return res.status(200).json({
+                data: userData,
+                message: 'My data'
+            })
+    }
+}
+
