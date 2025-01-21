@@ -14,5 +14,7 @@ export default () => {
     router.get('/:id', passport.authenticate('jwt', {session: false}), usersController.getUser)
     router.get('/', passport.authenticate('jwt', {session: false}), usersController.getUsers)
 
+    router.patch('/', passport.authenticate('jwt', {session: false}), usersController.updateUser)
+
     return router
 }

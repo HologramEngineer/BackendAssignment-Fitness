@@ -191,3 +191,53 @@ exports.getCurrentUser = async (_req: Request, res: Response, _next: NextFunctio
     }
 }
 
+exports.updateUser = async (_req: Request, res: Response, _next: NextFunction) => {
+    let user = _req.user as UserModel
+    if (user.role != ROLE.ADMIN)
+        return res.status(403).send({message: 'Updating user data requires ADMIN privileges'})
+
+    try {
+        let userToUpdate = await User.findOne({where: {id:_req.body.id}}) as UserModel
+        let update = false
+
+        if (userToUpdate == undefined) {
+            return res.status(400).send('User with id ' + _req.body.id + ' could not be found.')
+        }
+
+        if (_req.body.name != undefined) {
+            userToUpdate.name = _req.body.name
+            update = true
+        }
+
+        if (_req.body.surname != undefined) {
+            userToUpdate.surname = _req.body.surname
+            update = true
+        }
+
+        if (_req.body.nickName != undefined) {
+            userToUpdate.nickName = _req.body.nickName
+            update = true
+        }
+
+        if (_req.body.age != undefined) {
+            userToUpdate.age = _req.body.age
+            update = true
+        }
+
+        if (_req.body.role != undefined) {
+            let roleString = (_req.body.role as string).toUpperCase() as keyof typeof ROLE
+            userToUpdate.role = ROLE[roleString]
+            update = true
+        }
+
+        if (!update)
+            return res.status(200).send('User was not updated.')
+
+        await userToUpdate.save()
+
+        return res.status(200).send('User with id ' + _req.body.id + ' updated successfully.')
+    } catch (error) {
+        return res.status(400).send(error)
+    }
+}
+
