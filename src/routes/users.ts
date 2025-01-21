@@ -9,6 +9,7 @@ const usersController = require('../controllers/usersController')
 export default () => {
     router.post('/register', usersController.registerUser);
     router.get('/login', usersController.loginUser);
+    router.get('/logout', usersController.logoutUser);
 
     router.get('/profile', passport.authenticate('jwt', {session: false}), usersController.getCurrentUser)
     router.get('/:id', passport.authenticate('jwt', {session: false}), usersController.getUser)

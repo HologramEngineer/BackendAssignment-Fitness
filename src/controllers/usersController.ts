@@ -113,6 +113,11 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
     })
 }
 
+exports.logoutUser = async (_req: Request, res: Response, _next: NextFunction) => {
+    res.clearCookie('jwt')
+    return res.status(200).send({message: 'User logged out'})
+}
+
 exports.getUsers = async (_req: Request, res: Response, _next: NextFunction) => {
     let user = _req.user as UserModel
 
