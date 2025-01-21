@@ -90,17 +90,17 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
                 // create user object with only required data
                 const user_data = {
                     userId: user.id,
-                    email: user.email,
-                    role: user.role
+                    email: user.email
                 }
 
                 // create jwt token to be used for authorization
-                const jwt_token = jwt.sign(user_data, process.env.JWT_SECRET, {expiresIn: '1h'})
+                const jwt_token = jwt.sign(user_data, process.env.JWT_SECRET,
+                    {expiresIn: process.env.JWT_COOKIE_EXPIRATION})
 
                 // save jwt token to user's cookies
                 res.cookie('jwt', jwt_token, {
                     httpOnly: true,
-                    expires: new Date(new Date().getTime() + 3600 * 1000), // 1h of seconds * 1000 ms
+                    expires: new Date(new Date().getTime() + process.env.JWT_COOKIE_EXPIRATION),
                 })
 
                 return res.status(200).json({message: 'Successfully logged in'})

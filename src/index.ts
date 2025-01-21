@@ -3,20 +3,27 @@ import express from 'express'
 import * as bodyParser from 'body-parser'
 import 'dotenv/config'
 
-import { sequelize } from './db'
+import {sequelize} from './db'
+import passport from 'passport'
+import {jwtStrategy} from './auth/jwtStrategy'
+import cookieParser from 'cookie-parser'
+
 import ProgramRouter from './routes/programs'
 import ExerciseRouter from './routes/exercises'
 import UserRouter from './routes/users'
 
 const app = express()
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
+app.use(cookieParser())
 app.use('/programs', ProgramRouter())
 app.use('/exercises', ExerciseRouter())
 app.use('/users', UserRouter())
 
 const httpServer = http.createServer(app)
+
+passport.use(jwtStrategy)
 
 sequelize.sync()
 

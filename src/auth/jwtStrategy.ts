@@ -1,8 +1,10 @@
-import {Strategy as JwtStrategy, StrategyOptionsWithoutRequest} from 'passport-jwt'
-import {UserModel} from "../db/user";
+import {Strategy as JwtStrategy} from 'passport-jwt'
 import {Request} from "express";
+import {models} from '../db'
 
-const cookieExtractor = function (req: Request) {
+const {User} = models
+
+const cookieExtractor = function (req:Request) {
     let token = null;
     if (req && req.cookies) {
         token = req.cookies['jwt'];
@@ -10,14 +12,22 @@ const cookieExtractor = function (req: Request) {
     return token;
 }
 
-const options: StrategyOptionsWithoutRequest = {
+const options = {
     jwtFromRequest: cookieExtractor,
     secretOrKey: process.env.JWT_SECRET
 }
 
-// export const jwtStrategy = new JwtStrategy(
-//     options,
-//     done
-// ) {
-//     return done(null, UserModel)
-// };
+export const jwtStrategy = new JwtStrategy(
+    options,
+    async function (jwtPayload, done) {
+        console.log(jwtPayload);
+
+        let user = await User.findOne({where:{email: jwtPayload.email}})
+
+        if (!user) {
+            return done(new Error('User not found'), false)
+        }
+
+        return done(null, user);
+    }
+)

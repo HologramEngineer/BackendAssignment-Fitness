@@ -1,32 +1,36 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import {Router, Request, Response, NextFunction} from 'express'
 
-import { models } from '../db'
+import {models} from '../db'
+import passport from "passport";
 
 const router: Router = Router()
 
 const {
-	Exercise,
-	Program
+    Exercise,
+    Program
 } = models
 
 export default () => {
-	router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
-		const exercises = await Exercise.findAll({
-			include: [{
-				model: Program,
-				as: 'program'
-			}]
-		})
+    router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
+        const exercises = await Exercise.findAll({
+            include: [{
+                model: Program,
+                as: 'program'
+            }]
+        })
 
-		return res.json({
-			data: exercises,
-			message: 'List of exercises'
-		})
-	})
+        return res.json({
+            data: exercises,
+            message: 'List of exercises'
+        })
+    })
 
-	router.post('/', async (_req: Request, res: Response, _next: NextFunction) => {
+    router.post('/', passport.authenticate('jwt', {session: false}),
+        async (req: Request, res: Response, next: NextFunction) => {
+            console.log(req.user)
 
-	})
+            return res.status(200).json({})
+        })
 
-	return router
+    return router
 }
