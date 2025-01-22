@@ -104,7 +104,7 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
 				// save jwt token to user's cookies
 				res.cookie('jwt', jwt_token, {
 					httpOnly: true,
-					expires: new Date(new Date().getTime() + process.env.JWT_COOKIE_EXPIRATION),
+					expires: new Date(new Date().getTime() + parseInt(process.env.JWT_COOKIE_EXPIRATION)),
 				})
 
 				return res.status(200).send({message: 'Successfully logged in'})
