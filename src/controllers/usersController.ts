@@ -26,12 +26,12 @@ exports.registerUser = async (_req: Request, res: Response, _next: NextFunction)
 	const role = ROLE[roleString]
 
 	if (role == undefined)
-		return res.status(400).json({message: 'Proper role is required'})
+		return res.status(400).send({message: 'Proper role is required'})
 
 	bcrypt.hash(_req.body.password, 10, async (err, hash) => {
 		if (err) {
 			console.error('Error hashing password: ' + err.message)
-			return res.status(400).send({message: 'Error hashing password'})
+			return res.status(500).send({message: 'Error hashing password'})
 		} else {
 			const [user, created] = await User.findOrCreate({
 				where: {email: _req.body.email},
@@ -49,16 +49,16 @@ exports.registerUser = async (_req: Request, res: Response, _next: NextFunction)
 
 			if (created) {
 				console.log('User successfully registered under id ' + user.id + ' with email ' + user.email)
-				return res.status(200).json({message: 'Successfully registered'})
+				return res.status(200).send({message: 'Successfully registered'})
 			} else {
 				console.log('User not registered')
 
 				if (user != undefined) {
 					console.log('User already exists under id ' + user.id)
-					return res.status(200).json({message: 'User already registered'})
+					return res.status(200).send({message: 'User already registered'})
 				} else {
 					console.warn('Error creating user')
-					return res.status(400).send({message: 'Error registering user'})
+					return res.status(500).send({message: 'Error registering user'})
 				}
 			}
 		}
@@ -86,7 +86,7 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
 
 	bcrypt.compare(_req.body.password, user.password, (err, success) => {
 		if (err) {
-			return res.status(400).send({message: 'Error comparing passwords: ' + err.message})
+			return res.status(500).send({message: 'Error comparing passwords'})
 		} else {
 			if (success) {
 				console.log('User logged in successfully')
@@ -107,7 +107,7 @@ exports.loginUser = async (_req: Request, res: Response, _next: NextFunction) =>
 					expires: new Date(new Date().getTime() + process.env.JWT_COOKIE_EXPIRATION),
 				})
 
-				return res.status(200).json({message: 'Successfully logged in'})
+				return res.status(200).send({message: 'Successfully logged in'})
 			} else {
 				return res.status(401).send({message: 'Wrong password'})
 			}
@@ -262,7 +262,7 @@ exports.updateUser = async (_req: Request, res: Response, _next: NextFunction) =
 
 		return res.status(200).send('User with id ' + _req.body.id + ' updated successfully.')
 	} catch (error) {
-		return res.status(400).send(error)
+		return res.status(500).send('Error processing request')
 	}
 }
 

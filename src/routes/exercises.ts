@@ -110,7 +110,7 @@ export default () => {
 
 				return res.status(200).send('Exercise created successfully.')
 			} catch (error) {
-				return res.status(400).send(error)
+				return res.status(500).send('Error processing request')
 			}
 		})
 
@@ -159,7 +159,7 @@ export default () => {
 
 				return res.status(200).send('Exercise with id ' + _req.body.id + ' updated successfully.')
 			} catch (error) {
-				return res.status(400).send(error)
+				return res.status(500).send('Error processing request')
 			}
 		})
 
@@ -188,7 +188,7 @@ export default () => {
 					return res.status(200).send('Exercise with id ' + _req.body.id + ' was not deleted. ' +
 						'Please check if it exists.')
 			} catch (error) {
-				return res.status(400).send(error)
+				return res.status(500).send('Error processing request')
 			}
 		})
 

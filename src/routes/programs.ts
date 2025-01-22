@@ -55,9 +55,9 @@ export default () => {
                     return res.status(400).send('Something went wrong creating program.')
                 }
 
-                return res.status(200).json({message: 'Program created successfully.'})
+                return res.status(200).send({message: 'Program created successfully.'})
             } catch (error) {
-                return res.status(400).send(error)
+                return res.status(500).send('Error processing request')
             }
         })
 
@@ -90,7 +90,7 @@ export default () => {
 
                 return res.status(200).send('Program with id ' + _req.body.id + ' updated successfully.')
             } catch (error) {
-                return res.status(400).send(error)
+                return res.status(500).send('Error processing request')
             }
         })
 
@@ -133,7 +133,7 @@ export default () => {
 
                 return res.status(200).send('Program with id ' + _req.body.id + ' deleted successfully.')
             } catch (error) {
-                return res.status(400).send(error)
+                return res.status(500).send('Error processing request')
             }
         })
 

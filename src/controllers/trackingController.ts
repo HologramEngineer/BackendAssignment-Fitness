@@ -54,7 +54,7 @@ exports.postTrackedExercise = async (_req: Request, res: Response, _next: NextFu
 
 		return res.status(200).send('Exercise created successfully.')
 	} catch (error) {
-		return res.status(400).send(error)
+		return res.status(500).send('Error processing request')
 	}
 }
 
@@ -83,6 +83,6 @@ exports.removeTrackedExercise = async (_req: Request, res: Response, _next: Next
 			return res.status(200).send('Tracked exercise with id ' + _req.body.id + ' was not deleted. ' +
 				'Please check if it exists and if it belongs to you.')
 	} catch (error) {
-		return res.status(400).send(error)
+		return res.status(500).send('Error processing request')
 	}
 }
