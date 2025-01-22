@@ -6,6 +6,7 @@ import {UserModel} from "../db/user";
 import {EXERCISE_DIFFICULTY, ROLE} from "../utils/enums";
 import {ExerciseModel} from "../db/exercise";
 import {FindOptions} from "sequelize";
+import {body, validationResult} from "express-validator";
 
 const router: Router = Router()
 
@@ -15,6 +16,9 @@ const {
 } = models
 
 export default () => {
+	// 	GET
+	//	Returns list of all exercises in database
+	// 	Can be further specified by page + limits, program id, and / or fulltext search
 	router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
 		let options: FindOptions = {
 			include: [{
@@ -23,11 +27,19 @@ export default () => {
 			}]
 		}
 
+		//	note: didn't use express-validator because all parameters here are optional, and I'm not sure if it's possible
+		//		to use it this way
+
 		if (_req.query.page && _req.query.limit) {
 			console.log('Doing paginated search with limit ' + _req.query.limit + ' starting at page ' + _req.query.page)
 
 			const limit = parseInt(<string>_req.query.limit)
 			const offset = (parseInt(<string>_req.query.page) - 1) * limit
+
+			if (limit == undefined || isNaN(limit)  || offset == undefined || isNaN(offset))
+			{
+				return res.status(400).send("Invalid query parameters")
+			}
 
 			options.limit = limit
 			options.offset = offset
@@ -53,7 +65,6 @@ export default () => {
 			options.where = {name: _req.query.search}
 		}
 
-
 		const exercises = await Exercise.findAll(options)
 
 		return res.json({
@@ -62,12 +73,22 @@ export default () => {
 		})
 	})
 
-	router.post('/', passport.authenticate('jwt', {session: false}),
+	//	POST
+	//	[ADMIN] Creates new exercise
+	router.post('/',
+		passport.authenticate('jwt', {session: false}),
+		body('name').escape().notEmpty(),
+		body('programID').escape().notEmpty().isNumeric(),
 		async (_req: Request, res: Response, _next: NextFunction) => {
 			const user = _req.user as UserModel
 
 			if (user.role != ROLE.ADMIN)
 				return res.status(403).send('Creating, updating or deleting exercises requires ADMIN privileges.')
+
+			const validRes = validationResult(_req);
+			if (!validRes.isEmpty()) {
+				return res.status(400).send('Invalid request parameters')
+			}
 
 			let diff: EXERCISE_DIFFICULTY
 
@@ -93,29 +114,38 @@ export default () => {
 			}
 		})
 
-	router.patch('/', passport.authenticate('jwt', {session: false}),
+	//	PATCH
+	//	[ADMIN] Updates existing exercise
+	router.patch('/',
+		passport.authenticate('jwt', {session: false}),
+		body('id').escape().notEmpty().isNumeric(),
 		async (_req: Request, res: Response, _next: NextFunction) => {
 			const user = _req.user as UserModel
 
 			if (user.role != ROLE.ADMIN)
 				return res.status(403).send('Creating, updating or deleting exercises requires ADMIN privileges.')
 
+			const validRes = validationResult(_req);
+			if (!validRes.isEmpty()) {
+				return res.status(400).send('Invalid request parameters')
+			}
+
 			try {
-				let newExercise = await Exercise.findOne({where: {id: _req.body.id}}) as ExerciseModel
+				let exerciseToUpdate = await Exercise.findOne({where: {id: _req.body.id}}) as ExerciseModel
 				let update = false
 
-				if (newExercise == undefined) {
+				if (exerciseToUpdate == undefined) {
 					return res.status(400).send('Exercise with id ' + _req.body.id + ' could not be found.')
 				}
 
 				if (_req.body.name != undefined) {
-					newExercise.name = _req.body.name
+					exerciseToUpdate.name = _req.body.name
 					update = true
 				}
 
 				if (_req.body.difficulty != undefined) {
 					let diffString = (_req.body.difficulty as string).toUpperCase() as keyof typeof EXERCISE_DIFFICULTY
-					newExercise.difficulty = EXERCISE_DIFFICULTY[diffString]
+					exerciseToUpdate.difficulty = EXERCISE_DIFFICULTY[diffString]
 					update = true
 				}
 
@@ -125,7 +155,7 @@ export default () => {
 				if (!update)
 					return res.status(200).send('Nothing to update.')
 
-				await newExercise.save()
+				await exerciseToUpdate.save()
 
 				return res.status(200).send('Exercise with id ' + _req.body.id + ' updated successfully.')
 			} catch (error) {
@@ -133,12 +163,21 @@ export default () => {
 			}
 		})
 
-	router.delete('/', passport.authenticate('jwt', {session: false}),
+	//	DELETE
+	//	[ADMIN] Removes selected exercise
+	router.delete('/',
+		passport.authenticate('jwt', {session: false}),
+		body('id').escape().notEmpty().isNumeric(),
 		async (_req: Request, res: Response, _next: NextFunction) => {
 			const user = _req.user as UserModel
 
 			if (user.role != ROLE.ADMIN)
 				return res.status(403).send('Creating, updating or deleting exercises requires ADMIN privileges.')
+
+			const validRes = validationResult(_req);
+			if (!validRes.isEmpty()) {
+				return res.status(400).send('Invalid request parameters')
+			}
 
 			try {
 				const rowsUpdated = await Exercise.destroy({where: {id: _req.body.id}})

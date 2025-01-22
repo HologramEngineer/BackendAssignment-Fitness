@@ -10,6 +10,7 @@ import passport from "passport";
 import {UserModel} from "../db/user";
 import {ROLE} from "../utils/enums";
 import {ProgramModel} from "../db/program";
+import {body, validationResult} from "express-validator";
 
 const router: Router = Router()
 
@@ -19,6 +20,8 @@ const {
 } = models
 
 export default () => {
+    //  GET
+    //  Returns list of all programs in database
     router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
         const programs = await Program.findAll()
         return res.json({
@@ -27,12 +30,21 @@ export default () => {
         })
     })
 
-    router.post('/', passport.authenticate('jwt', {session: false}),
+    //  POST
+    //  [ADMIN] Creates new program
+    router.post('/',
+        passport.authenticate('jwt', {session: false}),
+        body('name').escape().notEmpty(),
         async (_req: Request, res: Response, _next: NextFunction) => {
             const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
+
+            const validRes = validationResult(_req);
+            if (!validRes.isEmpty()) {
+                return res.status(400).send('Invalid request parameters')
+            }
 
             try {
                 const newProgram = await Program.create({
@@ -49,14 +61,22 @@ export default () => {
             }
         })
 
-    router.patch('/', passport.authenticate('jwt', {session: false}),
+    //  PATCH
+    //  [ADMIN] Updates selected program
+    router.patch('/',
+        passport.authenticate('jwt', {session: false}),
+        body('name').escape().notEmpty(),
+        body('id').escape().notEmpty().isNumeric(),
         async (_req: Request, res: Response, _next: NextFunction) => {
             const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
 
-            // todo: check if _req.body.name is set before trying to update it
+            const validRes = validationResult(_req);
+            if (!validRes.isEmpty()) {
+                return res.status(400).send('Invalid request parameters')
+            }
 
             try {
                 let program = await Program.findOne({where: {id: _req.body.id}}) as ProgramModel
@@ -74,12 +94,20 @@ export default () => {
             }
         })
 
+    //  DELETE
+    //  [ADMIN] Removes selected program and its associated exercises
     router.delete('/', passport.authenticate('jwt', {session: false}),
+        body('id').escape().notEmpty().isNumeric(),
         async (_req: Request, res: Response, _next: NextFunction) => {
             const user = _req.user as UserModel
 
             if (user.role != ROLE.ADMIN)
                 return res.status(403).send('Creating, updating or deleting programs requires ADMIN privileges.')
+
+            const validRes = validationResult(_req);
+            if (!validRes.isEmpty()) {
+                return res.status(400).send('Invalid request parameters')
+            }
 
             try {
                 const program = await Program.findOne(
